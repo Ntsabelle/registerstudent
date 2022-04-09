@@ -1,8 +1,10 @@
-package student;
+package student.studentConfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.CommandLineRunner;
+import student.entity.Student;
+import student.studentRepository.StudentRepository;
 
 import java.time.LocalDate;
 import java.time.Month;

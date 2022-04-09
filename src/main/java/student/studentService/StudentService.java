@@ -1,9 +1,12 @@
-package student;
+package student.studentService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import student.emailValidator.EmailValidator;
+import student.entity.Student;
 import student.exception.BadRequestException;
 import student.exception.StudentNotFoundException;
+import student.studentRepository.StudentRepository;
 
 import java.util.List;
 
@@ -11,10 +14,13 @@ import java.util.List;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final EmailValidator emailValidator;
+
 
     @Autowired
-    public StudentService(StudentRepository studentRepository) {
+    public StudentService(StudentRepository studentRepository, EmailValidator emailValidator) {
         this.studentRepository = studentRepository;
+        this.emailValidator = emailValidator;
     }
 
     public List<Student> getStudents() {
@@ -47,13 +53,19 @@ public class StudentService {
         Boolean mailTaken = studentRepository.selectExistsEmail(student.getEmail());
         Boolean namesTaken = studentRepository.selectExistsNames(student.getFirstname(),student.getLastname());
 
+        if (!emailValidator.test(student.getEmail())) {
+            throw new BadRequestException(student.getEmail() + " is not valid");
+        }
+
         if (namesTaken) {
-            throw new BadRequestException(" Student with first Name: " + student.getFirstname() +" and Last Name: "+ " already exist in our DB");
+            throw new BadRequestException(" Student with first Name: "
+                    + student.getFirstname() +" and Last Name: "+student.getLastname() +" already exist in our DB");
         }
         else
 
         if (mailTaken) {
-            throw new BadRequestException(" Student with: " + student.getEmail() + " already exist in our DB");
+            throw new BadRequestException(" Student with: "
+                    + student.getEmail() + " already exist in our DB");
         }
 
         return studentRepository.save(student);
