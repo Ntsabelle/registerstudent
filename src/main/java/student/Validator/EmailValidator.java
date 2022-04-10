@@ -1,4 +1,4 @@
-package student.emailValidator;
+package student.Validator;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Predicate;
@@ -12,8 +12,15 @@ public class EmailValidator implements Predicate<String> {
                     Pattern.CASE_INSENSITIVE
             ).asPredicate();
 
+    private static final Predicate<String> IS_PHONE_VALID =
+            Pattern.compile(
+                    "^(\\+\\d{1,2}\\s?)?1?\\-?\\.?\\s?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$",
+                    Pattern.CASE_INSENSITIVE
+            ).asPredicate();
+
     @Override
     public boolean test(String email) {
         return IS_EMAIL_VALID.test(email);
     }
+
 }

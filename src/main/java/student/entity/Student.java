@@ -1,11 +1,11 @@
 package student.entity;
 
-import student.exception.BadRequestException;
-
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
-@Table
 public class Student {
 
     @Id
@@ -33,29 +33,42 @@ public class Student {
 
     private String cellphone_number;
 
-    private Integer current_score;
+    private Double avr;
 
-    public Student()
-    {}
+    @OneToMany(targetEntity = Score.class,cascade = CascadeType.ALL)
+    @JoinColumn(name = "ss_fk",referencedColumnName = "studentid")
+    private List<Score> scores;
+
+    public Student() {
+        scores = new ArrayList<>();
+    }
 
 
-    public Student(Long studentid, String firstname, String lastname, LocalDate dob, String cellphone_number, String email_address, Integer current_score) {
+    public Student(String firstname, String lastname, String email, LocalDate dob, String cellphone_number, List<Score> scores) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.dob = dob;
+        this.cellphone_number = cellphone_number;
+        this.scores = scores;
+    }
+
+    public Student(Long studentid, String firstname, String lastname, String email, LocalDate dob, String cellphone_number, List<Score> scores) {
         this.studentid = studentid;
         this.firstname = firstname;
         this.lastname = lastname;
+        this.email = email;
         this.dob = dob;
         this.cellphone_number = cellphone_number;
-        this.email = email_address;
-        this.current_score = current_score;
+        this.scores = scores;
     }
 
-    public Student(String firstname, String lastname, LocalDate dob, String cellphone_number, String email_address, Integer current_score) {
+    public Student(String firstname, String lastname, String email, LocalDate dob, String cellphone_number) {
         this.firstname = firstname;
         this.lastname = lastname;
+        this.email = email;
         this.dob = dob;
         this.cellphone_number = cellphone_number;
-        this.email = email_address;
-        this.current_score = current_score;
     }
 
     public Long getStudentid() {
@@ -82,6 +95,14 @@ public class Student {
         this.lastname = lastname;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public LocalDate getDob() {
         return dob;
     }
@@ -98,25 +119,37 @@ public class Student {
         this.cellphone_number = cellphone_number;
     }
 
-    public String getEmail() {
-        return email;
+    public Double getAvr() {
+        return avr= calcAvr();
     }
 
-    public void setEmail(String email_address) {
-        this.email = email_address;
+    public void setAvr(Double avr) {
+
+
+        this.avr = calcAvr();
     }
 
-    public Integer getCurrent_score() {
-        return current_score;
+    //Average cal function
+    public Double calcAvr()
+    {
+
+        float sum =0;
+        Double aver =0.0;
+        for (Score score:scores)
+        {
+            sum+=score.getScore();
+            aver= Double.valueOf((sum/scores.size()));
+        }
+        return aver;
     }
 
-    public void setCurrent_score(Integer current_score) {
-        if(current_score> 0 && current_score <= 100)
-        this.current_score = current_score;
-
-        else throw new BadRequestException("score must be between 1 and 100");
+    public List<Score> getScores() {
+        return scores;
     }
 
+    public void setScores(List<Score> scores) {
+        this.scores = scores;
+    }
 
     @Override
     public String toString() {
@@ -124,10 +157,11 @@ public class Student {
                 "studentid=" + studentid +
                 ", firstname='" + firstname + '\'' +
                 ", lastname='" + lastname + '\'' +
+                ", email='" + email + '\'' +
                 ", dob=" + dob +
                 ", cellphone_number='" + cellphone_number + '\'' +
-                ", email_address='" + email + '\'' +
-                ", current_score=" + current_score +
+                ", avr=" + avr +
+                ", scores=" + scores +
                 '}';
     }
 }

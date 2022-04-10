@@ -17,20 +17,20 @@ public class StudentConfig {
     {
         return arg -> {
 
-                    Student std1 =
-                            new Student("Tsitso",
-                                    "Ntsabi",
-                                    LocalDate.of(2001, Month.FEBRUARY,06),
-                                    "0735619861",
-                                    "tsits@gmail.com",
-                                    10);
+            Student std1 =
+                    new Student("Tsitso",
+                            "Ntsabi",
+                            "tsits@gmail.com",
+                            LocalDate.of(2001, Month.FEBRUARY,20),
+                            "0735619861"
+                           );
             Student std2 =
                     new Student("Mpho",
                             "Waka",
-                            LocalDate.of(2000, Month.OCTOBER,06),
-                            "0835619861",
                             "Mpho@gmail.com",
-                            14);
+                            LocalDate.of(2000, Month.OCTOBER,6),
+                            "0835619861"
+                            );
 
 
             repository.saveAll(

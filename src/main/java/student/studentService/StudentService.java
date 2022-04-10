@@ -2,7 +2,8 @@ package student.studentService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import student.emailValidator.EmailValidator;
+import student.Validator.EmailValidator;
+import student.Validator.PhoneValidator;
 import student.entity.Student;
 import student.exception.BadRequestException;
 import student.exception.StudentNotFoundException;
@@ -15,17 +16,27 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final EmailValidator emailValidator;
+    private final PhoneValidator phoneValidator;
 
 
     @Autowired
-    public StudentService(StudentRepository studentRepository, EmailValidator emailValidator) {
+    public StudentService(StudentRepository studentRepository, EmailValidator emailValidator, PhoneValidator phoneValidator) {
         this.studentRepository = studentRepository;
         this.emailValidator = emailValidator;
+        this.phoneValidator = phoneValidator;
     }
 
     public List<Student> getStudents() {
 
         return studentRepository.findAll();
+    }
+
+    public Student getStudentById(long studentid) {
+
+        return studentRepository.findById(studentid).orElseThrow(() ->
+                new StudentNotFoundException(
+                        "Student with id " + studentid + " does not exists"));
+
     }
 
     public List<Student> getStudentByFirstName(String firstName) {
@@ -40,14 +51,6 @@ public class StudentService {
         return studentRepository.findStudentByEmail(email);
     }
 
-    public Student getStudentById(long studentid) {
-
-        return studentRepository.findById(studentid).orElseThrow(() ->
-                new StudentNotFoundException(
-                        "Student with id " + studentid + " does not exists"));
-
-    }
-
     public Student saveStudent(Student student) {
 
         Boolean mailTaken = studentRepository.selectExistsEmail(student.getEmail());
@@ -55,6 +58,10 @@ public class StudentService {
 
         if (!emailValidator.test(student.getEmail())) {
             throw new BadRequestException(student.getEmail() + " is not valid");
+        }
+
+        if (!phoneValidator.test(student.getCellphone_number())) {
+            throw new BadRequestException("Phone numbers : "+student.getCellphone_number() + " not valid");
         }
 
         if (namesTaken) {
@@ -74,20 +81,29 @@ public class StudentService {
     public Student updateStudent(Student student, long studentid) {
 
         // we need to check whether student with given id exists in DB or not
+
         Student existingStudent= studentRepository.findById(studentid).orElseThrow(
                 () -> new StudentNotFoundException(
                         "Student with id " + studentid + " does not exists"));
 
         existingStudent.setFirstname(student.getFirstname());
         existingStudent.setLastname(student.getLastname());
-        existingStudent.setEmail(student.getLastname());
-        existingStudent.setCellphone_number(student.getCellphone_number());
+
+
+        if (!emailValidator.test(student.getEmail())) {
+            throw new BadRequestException(student.getEmail() + " is not valid");
+        }existingStudent.setEmail(student.getEmail());
+
+        if (!phoneValidator.test(student.getCellphone_number())) {
+            throw new BadRequestException("Phone numbers : "+student.getCellphone_number() + " not valid");
+        }existingStudent.setCellphone_number(student.getCellphone_number());
+
         existingStudent.setDob(student.getDob());
+
         // save existing Student to DB
         studentRepository.save(existingStudent);
         return existingStudent;
     }
-
 
     public void deleteStudent(Long studentId) {
 
