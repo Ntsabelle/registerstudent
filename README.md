@@ -20,7 +20,7 @@ System can execute below functions
                         Date of Birth
                         Cellphone Number
                         Email Address
--Delete student profile : System only delete id 
+-Delete student profile : System only delete by student id 
 
 -Capture a specific student’s latest score and calculate average scores
 -Search student profiles registered on the system bty below fields : Student Number
